@@ -75,7 +75,34 @@ $(function() {
 function addMarker(place)
 {
     // TODO
-    markers.push(place);
+    var marker = new google.maps.Marker({
+        icon : "https://maps.google.com/mapfiles/kml/pal2/icon31.png",
+        position : new google.maps.LatLng(place.latitude, place.longitude),
+        map : map,
+        label : places.place_name + ", " + places.admin_name1
+    });
+    google.maps.event.addListener(marker, "click", function(){
+        showInfo(marker);
+        $.getJSON("articles.php", {
+            geo : place.postal_code
+        })
+        .done(function(data, textStatus, jqXHR){
+            if (data.length === 0){
+                showInfo(marker, "No News.");
+            }
+            else{
+                var list = "<ul>";
+                var template = _.template("<li><a href = '<%- link %>' target = '_blank'><%- title %></a></li>");
+                data.forEach(function(item){
+                    list += template(item.link, item.title);
+                });
+                list += "</ul>";
+                showInfo(marker, list);
+            }
+        });
+    });
+    
+    markers.push(marker);
 }
 
 /**
@@ -161,7 +188,10 @@ function hideInfo()
 function removeMarkers()
 {
     // TODO
-    markers = [];
+    markers.forEach(function(item){
+        item.setMap(null);
+    });
+    markers.length = 0;
 }
 
 /**
@@ -222,7 +252,7 @@ function update()
     var bounds = map.getBounds();
     var ne = bounds.getNorthEast();
     var sw = bounds.getSouthWest();
-console.log(ne, sw);
+    
     // get places within bounds (asynchronously)
     var parameters = {
         ne: ne.lat() + "," + ne.lng(),
