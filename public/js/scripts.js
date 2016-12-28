@@ -74,12 +74,13 @@ $(function() {
  */
 function addMarker(place)
 {
-    // TODO
-    var marker = new google.maps.Marker({
+    var marker = new MarkerWithLabel({
         icon : "https://maps.google.com/mapfiles/kml/pal2/icon31.png",
         position : new google.maps.LatLng(place.latitude, place.longitude),
         map : map,
-        label : places.place_name + ", " + places.admin_name1
+        labelContent : place.place_name + ", " + place.admin_name1,
+        labelAnchor : new google.maps.Point(18, 0),
+        labelClass : "label"
     });
     google.maps.event.addListener(marker, "click", function(){
         showInfo(marker);
@@ -92,13 +93,15 @@ function addMarker(place)
             }
             else{
                 var list = "<ul>";
-                var template = _.template("<li><a href = '<%- link %>' target = '_blank'><%- title %></a></li>");
                 data.forEach(function(item){
-                    list += template(item.link, item.title);
+                    list += "<li><a href = '" + item.link + "' target = '_blank'>" + item.title + "</a></li>";
                 });
                 list += "</ul>";
                 showInfo(marker, list);
             }
+        })
+        .fail(function(jqXHR, textStatus, errorThrown){
+            console.log(errorThrown.toString());
         });
     });
     
