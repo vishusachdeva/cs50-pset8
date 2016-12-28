@@ -75,6 +75,7 @@ $(function() {
 function addMarker(place)
 {
     // TODO
+    markers.push(place);
 }
 
 /**
@@ -108,7 +109,7 @@ function configure()
         source: search,
         templates: {
             empty: "no places found yet",
-            suggestion: _.template("<p>TODO</p>")
+            suggestion: _.template("<p><%- place_name %>, <%- admin_name1 %>, <%- postal_code %></p>")
         }
     });
 
@@ -160,6 +161,7 @@ function hideInfo()
 function removeMarkers()
 {
     // TODO
+    markers = [];
 }
 
 /**
