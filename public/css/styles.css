@@ -43,12 +43,12 @@ html, body, #map-canvas, .container-fluid
     background-color: #ffffff !important;
 
     /* text box's width */
-    width: 310px;
+    width: 317px;
 }
 
 #q2
 {
-    width:179px;
+    width:186px;
 }
 
 /* stylize places' labels */
@@ -91,7 +91,7 @@ html, body, #map-canvas, .container-fluid
     max-height: 150px;
     overflow-y: auto;
     padding: 6px 12px;
-    width: 310px;
+    width: 317px;
 }
 .tt-suggestion.tt-cursor {
     background-color: #0097cf;
