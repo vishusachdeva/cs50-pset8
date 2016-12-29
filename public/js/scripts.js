@@ -18,6 +18,7 @@ var markers = [];
 // info window
 var info = new google.maps.InfoWindow(), infoWindow;
 
+// variable for marker
 var curMarker;
 
 // execute when the DOM is fully loaded
@@ -118,6 +119,9 @@ function addMarker(place)
     markers.push(marker);
 }
 
+/**
+ * Personal Touch
+ */
 function setZoom(){
     var element = document.getElementById("q2");
     if (element.value == ""){
