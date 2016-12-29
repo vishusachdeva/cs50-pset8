@@ -16,7 +16,7 @@ var map;
 var markers = [];
 
 // info window
-var info = new google.maps.InfoWindow();
+var info = new google.maps.InfoWindow(), infoWindow;
 
 // execute when the DOM is fully loaded
 $(function() {
@@ -66,6 +66,7 @@ $(function() {
 
     // configure UI once Google Map is idle (i.e., loaded)
     google.maps.event.addListenerOnce(map, "idle", configure);
+    
 
 });
 
@@ -92,11 +93,11 @@ function addMarker(place)
                 showInfo(marker, "No News.");
             }
             else{
-                var list = "<ul>";
+                var list = "<ol>";
                 data.forEach(function(item){
                     list += "<li><a href = '" + item.link + "' target = '_blank'>" + item.title + "</a></li>";
                 });
-                list += "</ul>";
+                list += "</ol>";
                 showInfo(marker, list);
             }
         })
@@ -106,6 +107,59 @@ function addMarker(place)
     });
     
     markers.push(marker);
+}
+
+function setZoom(){
+    var element = document.getElementById("q2");
+    if (element.value == ""){
+        alert("Sorry!! You must Provide Zoom-Level.")
+    }
+    else if (!(/^\+?[1-9][\d]*$/.test(element.value))){
+        alert("Sorry!! Zoom-Level must be a Positive Integer.");
+    }
+    else if (element.value < 0||element.value > 14){
+        alert("Sorry!! Zoom-Level out of range (0-14).");
+    }
+    else{
+        map.setZoom(Number(element.value));
+    }
+    element.value = "";
+}
+
+function getZoom(){
+    document.getElementById("button").innerHTML = "Current Zoom-Level is <b>" + map.getZoom() + "</b>";
+}
+
+function setLocation(){
+    if (infoWindow){
+        infoWindow.close();
+    }
+    infoWindow = new google.maps.InfoWindow({map: map});
+        
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+}
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(browserHasGeolocation ?
+      'Error: The Geolocation service failed.' :
+      'Error: Your browser doesn\'t support geolocation.');
 }
 
 /**
@@ -126,6 +180,11 @@ function configure()
     // remove markers whilst dragging
     google.maps.event.addListener(map, "dragstart", function() {
         removeMarkers();
+    });
+
+    google.maps.event.addListener(map, "mousemove", function(event){
+        document.getElementById("lat").innerHTML = event.latLng.lat().toFixed(4);
+        document.getElementById("lng").innerHTML = event.latLng.lng().toFixed(4);
     });
 
     // configure typeahead
@@ -190,9 +249,8 @@ function hideInfo()
  */
 function removeMarkers()
 {
-    // TODO
-    markers.forEach(function(item){
-        item.setMap(null);
+    markers.forEach(function(marker){
+        marker.setMap(null);
     });
     markers.length = 0;
 }
