@@ -18,6 +18,8 @@ var markers = [];
 // info window
 var info = new google.maps.InfoWindow(), infoWindow;
 
+var curMarker;
+
 // execute when the DOM is fully loaded
 $(function() {
 
@@ -67,6 +69,12 @@ $(function() {
     // configure UI once Google Map is idle (i.e., loaded)
     google.maps.event.addListenerOnce(map, "idle", configure);
     
+    curMarker = new google.maps.Marker({
+        position: {lat: 29.9663, lng: 74.7003},
+        map: map,
+        title: "29.9663, 74.7003"
+    });
+    
 
 });
 
@@ -79,6 +87,7 @@ function addMarker(place)
         icon : "https://maps.google.com/mapfiles/kml/pal2/icon31.png",
         position : new google.maps.LatLng(place.latitude, place.longitude),
         map : map,
+        title : "Click to Get News",
         labelContent : place.place_name + ", " + place.admin_name1,
         labelAnchor : new google.maps.Point(18, 0),
         labelClass : "label"
@@ -130,7 +139,7 @@ function getZoom(){
     document.getElementById("button").innerHTML = "Current Zoom-Level is <b>" + map.getZoom() + "</b>";
 }
 
-function setLocation(){
+function setLocation(loc){
     if (infoWindow){
         infoWindow.close();
     }
@@ -138,10 +147,18 @@ function setLocation(){
         
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
+              if (loc == true){
+                var pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+              }
+              else{
+                var pos = {
+                  lat: curMarker.getPosition().lat(),
+                  lng: curMarker.getPosition().lng()
+                };
+              }
 
             infoWindow.setPosition(pos);
             infoWindow.setContent('Location found.');
@@ -185,6 +202,15 @@ function configure()
     google.maps.event.addListener(map, "mousemove", function(event){
         document.getElementById("lat").innerHTML = event.latLng.lat().toFixed(4);
         document.getElementById("lng").innerHTML = event.latLng.lng().toFixed(4);
+    });
+
+    google.maps.event.addListener(map, "click", function(event){
+        curMarker.setMap(null);
+        curMarker = new google.maps.Marker({
+            position: event.latLng,
+            map: map,
+            title: event.latLng.lat().toFixed(4) + ", " + event.latLng.lng().toFixed(4)
+        });
     });
 
     // configure typeahead
